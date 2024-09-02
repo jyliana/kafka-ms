@@ -5,7 +5,7 @@ import com.course.kafka.api.request.OrderRequest;
 import com.course.kafka.broker.message.OrderMessage;
 import com.course.kafka.entity.Order;
 import com.course.kafka.entity.OrderItem;
-import com.course.kafka.producer.OrderProducer;
+import com.course.kafka.broker.producer.OrderProducer;
 import com.course.kafka.repository.OrderItemRepository;
 import com.course.kafka.repository.OrderRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -71,4 +71,5 @@ public class OrderAction {
 
 	orderProducer.publish(orderMessage);
   }
+
 }
