@@ -23,4 +23,18 @@ public class OrderMessage {
   private Integer price;
   private Integer quantity;
 
+  public OrderMessage copy() {
+	var copy = new OrderMessage();
+
+	copy.setOrderNumber(this.getOrderNumber());
+	copy.setOrderDateTime(this.getOrderDateTime());
+	copy.setOrderLocation(this.getOrderLocation());
+	copy.setCreditCardNumber(this.getCreditCardNumber());
+	copy.setItemName(this.getItemName());
+	copy.setPrice(this.getPrice());
+	copy.setQuantity(this.getQuantity());
+
+	return copy;
+  }
+
 }
