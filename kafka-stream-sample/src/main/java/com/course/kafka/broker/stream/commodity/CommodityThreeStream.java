@@ -10,10 +10,12 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.support.KafkaStreamBrancher;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
-//@Configuration
-public class CommodityOneStream {
+@Configuration
+public class CommodityThreeStream {
   @Bean
   public KStream<String, OrderMessage> kstreamCommodityTrading(StreamsBuilder builder) {
 	var stringSerde = Serdes.String();
@@ -22,13 +24,21 @@ public class CommodityOneStream {
 	var orderRewardSerde = new JsonSerde<>(OrderRewardMessage.class);
 
 	var maskedCreditCard = builder.stream("t-commodity-order", Consumed.with(stringSerde, orderSerde)).mapValues(CommodityStreamUtil::maskCreditCard);
-	maskedCreditCard.to("t-commodity-storage-one", Produced.with(stringSerde, orderSerde));
+	var storageStream = maskedCreditCard.selectKey(CommodityStreamUtil.generateStorageKey());
 
-	var patternStream = maskedCreditCard.mapValues(CommodityStreamUtil::mapToOrderPattern);
-	patternStream.to("t-commodity-pattern-one", Produced.with(stringSerde, orderPatternSerde));
+	storageStream.to("t-commodity-storage-two", Produced.with(stringSerde, orderSerde));
 
-	var rewardStream = maskedCreditCard.filter(CommodityStreamUtil.isLargeQuantity).mapValues(CommodityStreamUtil::mapToOrderReward);
-	rewardStream.to("t-commodity-reward-one", Produced.with(stringSerde, orderRewardSerde));
+	final var branchProducer = Produced.with(stringSerde, orderPatternSerde);
+	new KafkaStreamBrancher<String, OrderPatternMessage>()
+			.branch(CommodityStreamUtil.isPlastic, kstream -> kstream.to("t-commodity-pattern-two-plastic"))
+			.defaultBranch(kstream -> kstream.to("t-commodity-pattern-two-notplastic", branchProducer))
+			.onTopOf(maskedCreditCard.mapValues(CommodityStreamUtil::mapToOrderPattern));
+
+	var rewardStream = maskedCreditCard
+			.filter(CommodityStreamUtil.isLargeQuantity)
+			.filterNot(CommodityStreamUtil.isCheap)
+			.mapValues(CommodityStreamUtil::mapToOrderReward);
+	rewardStream.to("t-commodity-reward-two", Produced.with(stringSerde, orderRewardSerde));
 
 	return maskedCreditCard;
   }
