@@ -6,13 +6,17 @@ server:
   port: 9004
 
 spring:
+  application:
+    name: kafka-ms-storage
   main:
-    banner-mode: OFF
+    banner-mode: off
     log-startup-info: false
   kafka:
     listener:
       missing-topics-fatal: false
     producer:
+      bootstrap-servers:
+        - localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:

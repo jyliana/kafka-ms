@@ -5,26 +5,22 @@ import com.course.kafka.util.CommodityStreamUtil;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
-//@Configuration
+//@Component
 public class MaskOrderStream {
 
-  @Bean
-  public KStream<String, OrderMessage> kstreamCommodityTrading(StreamsBuilder builder) {
-	var stringSerde = Serdes.String();
+  @Autowired
+  void kstreamCommodityMask(StreamsBuilder builder) {
 	var orderSerde = new JsonSerde<>(OrderMessage.class);
-	var maskedCreditCardStream = builder
-			.stream("t-commodity-order", Consumed.with(stringSerde, orderSerde))
+	var maskedCreditCardStream = builder.stream("t-commodity-order", Consumed.with(Serdes.String(), orderSerde))
 			.mapValues(CommodityStreamUtil::maskCreditCard);
 
-	maskedCreditCardStream.to("t-commodity-order-masked", Produced.with(stringSerde, orderSerde));
-	maskedCreditCardStream.print(Printed.toSysOut());
-
-	return maskedCreditCardStream;
+	maskedCreditCardStream.to("t-commodity-order-masked", Produced.with(Serdes.String(), orderSerde));
+	maskedCreditCardStream.print(Printed.<String, OrderMessage>toSysOut().withLabel("Masked Order Stream"));
   }
+
 }

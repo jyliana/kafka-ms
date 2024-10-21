@@ -7,20 +7,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/promotion")
 public class PromotionApi {
 
   @Autowired
   private PromotionService service;
 
-  @PostMapping
-  public ResponseEntity<String> create(@RequestBody PromotionRequest request) {
+  @PostMapping(value = "/api/promotion", consumes = "application/json", produces = "application/json")
+  public ResponseEntity<String> createPromotion(@RequestBody PromotionRequest request) {
 	service.createPromotion(request);
-	return ResponseEntity.status(HttpStatus.CREATED).body(request.getPromotionCode());
+	return new ResponseEntity<>(request.getPromotionCode(), HttpStatus.CREATED);
   }
-
 }

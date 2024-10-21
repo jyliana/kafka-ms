@@ -12,8 +12,8 @@ public class DiscountService {
   private DiscountAction action;
 
   public void createDiscount(DiscountRequest request) {
-	action.publishToKafka(request);
+	var discountMessage = action.convertToMessage(request);
+	action.sendToKafka(discountMessage);
   }
 
 }
-

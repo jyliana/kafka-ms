@@ -19,27 +19,30 @@ public class OrderProducer {
   @Autowired
   private KafkaTemplate<String, OrderMessage> kafkaTemplate;
 
-  public void publish(OrderMessage message) {
-	var producerRecord = buildproducerRecord(message);
+  public void sendOrder(OrderMessage orderMessage) {
+	var producerRecord = buildProducerRecord(orderMessage);
 
-	kafkaTemplate.send(producerRecord).whenComplete((result, ex) -> {
-	  if (ex == null) {
-		log.info("Order {}, item {} published successfully", message.getOrderNumber(), message.getItemName());
-	  } else {
-		log.error("Failed to publish order {}, item {} due to {}", message.getOrderNumber(), message.getItemName(), ex.getMessage());
-	  }
-	});
-	log.info("Just a dummy message for order {}, item {}", message.getOrderNumber(), message.getItemName());
+	kafkaTemplate.send(producerRecord).whenComplete(
+			(recordMetadata, ex) -> {
+			  if (ex == null) {
+				log.info("Order {} sent successfully",
+						orderMessage.getOrderNumber());
+			  } else {
+				log.error("Failed to send order {}", orderMessage.getOrderNumber(), ex);
+			  }
+			});
+	log.info("Just a dummy message for order {}, item {}",
+			orderMessage.getOrderNumber(), orderMessage.getItemName());
   }
 
-  private ProducerRecord<String, OrderMessage> buildproducerRecord(OrderMessage message) {
-	var surpriseBonus = StringUtils.startsWithIgnoreCase(message.getOrderLocation(), "A") ? 25 : 15;
-	var headers = new ArrayList<Header>();
+  private ProducerRecord<String, OrderMessage> buildProducerRecord(OrderMessage orderMessage) {
+	var surpriseBonus = StringUtils.startsWithIgnoreCase(orderMessage.getOrderLocation(), "A") ? 25 : 15;
+	var kafkaHeaders = new ArrayList<Header>();
 	var surpriseBonusHeader = new RecordHeader("surpriseBonus", Integer.toString(surpriseBonus).getBytes());
 
-	headers.add(surpriseBonusHeader);
+	kafkaHeaders.add(surpriseBonusHeader);
 
-	return new ProducerRecord<String, OrderMessage>("t-commodity-order", null, message.getOrderNumber(), message, headers);
+	return new ProducerRecord<>("t-commodity-order", null, orderMessage.getOrderNumber(), orderMessage, kafkaHeaders);
   }
 
 }

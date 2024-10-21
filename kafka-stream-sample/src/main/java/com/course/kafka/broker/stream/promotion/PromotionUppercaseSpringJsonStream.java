@@ -1,38 +1,32 @@
 package com.course.kafka.broker.stream.promotion;
 
 import com.course.kafka.broker.message.PromotionMessage;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Consumed;
-import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
-@Slf4j
-@Configuration
+//@Component
 public class PromotionUppercaseSpringJsonStream {
 
-  @Bean
-  public KStream<String, PromotionMessage> kstreamPromotionUppercase(StreamsBuilder builder) {
-	var stringSerde = Serdes.String();
+  @Autowired
+  void kstreamPromotionUppercase(StreamsBuilder builder) {
 	var jsonSerde = new JsonSerde<>(PromotionMessage.class);
-	var sourceStream = builder.stream("t-commodity-promotion", Consumed.with(stringSerde, jsonSerde));
+	var sourceStream = builder.stream("t-commodity-promotion", Consumed.with(Serdes.String(), jsonSerde));
 	var uppercaseStream = sourceStream.mapValues(this::uppercasePromotionCode);
 
-	uppercaseStream.to("t-commodity-promotion-uppercase", Produced.with(stringSerde, jsonSerde));
+	uppercaseStream.to("t-commodity-promotion-uppercase", Produced.with(Serdes.String(), jsonSerde));
 
-	sourceStream.print(Printed.<String, PromotionMessage> toSysOut().withLabel("Spring JSON serde original stream"));
-	uppercaseStream.print(Printed.<String, PromotionMessage> toSysOut().withLabel("Spring JSON serde uppercase stream"));
-
-	return sourceStream;
+	sourceStream.print(Printed.<String, PromotionMessage>toSysOut().withLabel("JSON Serde Original stream"));
+	uppercaseStream.print(Printed.<String, PromotionMessage>toSysOut().withLabel("JSON Serde Uppercase stream"));
   }
 
-  public PromotionMessage uppercasePromotionCode(PromotionMessage message) {
-	return new PromotionMessage(message.getPromotionCode().toUpperCase());
+  private PromotionMessage uppercasePromotionCode(PromotionMessage promotionMessage) {
+	return new PromotionMessage(promotionMessage.getPromotionCode().toUpperCase());
   }
+
 
 }

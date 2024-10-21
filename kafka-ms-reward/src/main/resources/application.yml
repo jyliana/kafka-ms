@@ -6,8 +6,10 @@ server:
   port: 9003
 
 spring:
+  application:
+    name: kafka-ms-reward
   main:
-    banner-mode: OFF
+    banner-mode: off
     log-startup-info: false
   kafka:
     listener:
@@ -30,3 +32,6 @@ spring:
           json:
             trusted:
               packages: com.course.kafka.broker.message
+            value:
+              default:
+                type: java.lang.Object

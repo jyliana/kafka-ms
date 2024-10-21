@@ -1,7 +1,9 @@
 package com.course.kafka.command.service;
 
 import com.course.kafka.api.request.OrderRequest;
+import com.course.kafka.broker.message.OrderMessage;
 import com.course.kafka.command.action.OrderAction;
+import com.course.kafka.entity.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,15 +11,18 @@ import org.springframework.stereotype.Service;
 public class OrderService {
 
   @Autowired
-  private OrderAction orderAction;
+  private OrderAction action;
 
   public String saveOrder(OrderRequest request) {
-	var order = orderAction.convertToOrder(request);
-	orderAction.saveToDatabase(order);
+	Order orderEntity = action.convertToOrder(request);
+	action.saveToDatabase(orderEntity);
 
-	order.getItems().forEach(orderAction::publishToKafka);
+	orderEntity.getOrderItems().forEach(item -> {
+	  OrderMessage orderMessage = action.convertToOrderMessage(item);
+	  action.sendToKafka(orderMessage);
+	});
 
-	return order.getNumber();
+	return orderEntity.getOrderNumber();
   }
 
 }

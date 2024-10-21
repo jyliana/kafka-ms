@@ -12,10 +12,12 @@ public class PromotionAction {
   @Autowired
   private PromotionProducer producer;
 
-  public void publishToKafka(PromotionRequest request) {
-	var message = new PromotionMessage(request.getPromotionCode());
+  public PromotionMessage convertToPromotionMessage(PromotionRequest request) {
+	return new PromotionMessage(request.getPromotionCode());
+  }
 
-	producer.publish(message);
+  public void sendToKafka(PromotionMessage message) {
+	producer.sendPromotion(message);
   }
 
 }

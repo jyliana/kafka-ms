@@ -1,7 +1,7 @@
 package com.course.kafka.api.server;
 
 import com.course.kafka.api.request.OrderRequest;
-import com.course.kafka.api.response.OrderResponse;
+import com.course.kafka.api.responce.OrderResponse;
 import com.course.kafka.command.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderApi {
 
   @Autowired
-  private OrderService orderService;
+  private OrderService service;
 
-  @PostMapping
+  @PostMapping(value = "", consumes = "application/json", produces = "application/json")
   public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {
-	var orderNumber = orderService.saveOrder(request);
+	var orderNumber = service.saveOrder(request);
+	var response = new OrderResponse(orderNumber);
 
-	var orderResponse = new OrderResponse(orderNumber);
-
-	return ResponseEntity.ok().body(orderResponse);
+	return ResponseEntity.ok().body(response);
   }
 
 }

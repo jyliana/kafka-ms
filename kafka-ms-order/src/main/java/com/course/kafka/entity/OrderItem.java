@@ -12,26 +12,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "order_items")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "order_items")
 public class OrderItem {
 
   @Id
   @GeneratedValue
-  private Integer id;
+  private int orderItemId;
 
   @Column
-  private String name;
+  private String itemName;
 
   @Column
-  private Integer price;
+  private int price;
 
   @Column
-  private Integer quantity;
+  private int quantity;
 
-  @ManyToOne
   @JoinColumn(name = "order_id")
+  @ManyToOne
   private Order order;
+
 }

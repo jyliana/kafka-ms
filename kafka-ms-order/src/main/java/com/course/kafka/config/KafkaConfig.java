@@ -9,21 +9,18 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaConfig {
 
   @Bean
-  public NewTopic topicOrder() {
+  NewTopic topicCommodityOrder() {
 	return TopicBuilder
 			.name("t-commodity-order")
 			.partitions(2)
-			.replicas(1)
 			.build();
   }
 
-
   @Bean
-  public NewTopic topicOrderReply() {
+  NewTopic topicCommodityOrderReply() {
 	return TopicBuilder
 			.name("t-commodity-order-reply")
-			.partitions(1)
-			.replicas(1)
+			.partitions(2)
 			.build();
   }
 

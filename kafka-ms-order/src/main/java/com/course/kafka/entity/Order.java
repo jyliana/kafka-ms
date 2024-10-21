@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Entity
@@ -22,21 +22,20 @@ public class Order {
 
   @Id
   @GeneratedValue
-  private Integer id;
+  private int orderId;
 
   @Column
-  private String number;
+  private String orderNumber;
 
   @Column
-  private String location;
+  private String orderLocation;
 
   @Column
-  private LocalDateTime dateTime;
+  private OffsetDateTime orderDateTime;
 
   @Column
   private String creditCardNumber;
 
   @OneToMany(mappedBy = "order")
-  private List<OrderItem> items;
-
+  private List<OrderItem> orderItems;
 }
