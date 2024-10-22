@@ -6,6 +6,7 @@ import com.course.kafka.broker.message.OrderRewardMessage;
 import com.course.kafka.util.CommodityStreamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.Consumed;
@@ -15,7 +16,7 @@ import org.springframework.kafka.support.serializer.JsonSerde;
 
 @Slf4j
 //@Component
-public class CommodityFourStream {
+public class CommodityFiveStream {
 
   @Autowired
   void kstreamCommodityTrading(StreamsBuilder builder) {
@@ -30,22 +31,25 @@ public class CommodityFourStream {
 	maskedCreditCardStream.mapValues(CommodityStreamUtil::convertToOrderPatternMessage)
 			.split()
 			.branch(CommodityStreamUtil.isPlastic(), Branched.<String, OrderPatternMessage>withConsumer(
-					ks -> ks.to("t-commodity-pattern-four-plastic", Produced.with(stringSerde, orderPatternSerde))))
+					ks -> ks.to("t-commodity-pattern-five-plastic", Produced.with(stringSerde, orderPatternSerde))))
 			.defaultBranch(Branched.<String, OrderPatternMessage>withConsumer(
-					ks -> ks.to("t-commodity-pattern-four-notplastic", Produced.with(stringSerde, orderPatternSerde))));
+					ks -> ks.to("t-commodity-pattern-five-notplastic", Produced.with(stringSerde, orderPatternSerde))));
 
 	maskedCreditCardStream.filter(CommodityStreamUtil.isLargeQuantity())
 			.filterNot(CommodityStreamUtil.isCheap())
 			.map(CommodityStreamUtil.mapToOrderRewardChangeKey())
-			.to("t-commodity-reward-four", Produced.with(stringSerde, orderRewardSerde));
+			.to("t-commodity-reward-five", Produced.with(stringSerde, orderRewardSerde));
 
 	maskedCreditCardStream
 			.selectKey(CommodityStreamUtil.generateStorageKey())
-			.to("t-commodity-storage-four", Produced.with(stringSerde, orderSerde));
+			.to("t-commodity-storage-five", Produced.with(stringSerde, orderSerde));
 
 	maskedCreditCardStream
 			.filter((key, value) -> value.getOrderLocation().toUpperCase().startsWith("C"))
-			.foreach((key, value) -> reportFraud(value));
+			.peek((key, value) -> reportFraud(value))
+			.map((key, value) -> KeyValue.pair(value.getOrderLocation().toUpperCase().charAt(0) + "***",
+					 value.getPrice() * value.getQuantity()))
+			.to("t-commodity-fraud-five", Produced.with(stringSerde, Serdes.Integer()));
   }
 
   private void reportFraud(OrderMessage orderMessage) {
