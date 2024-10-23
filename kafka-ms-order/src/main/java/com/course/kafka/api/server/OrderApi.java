@@ -1,7 +1,7 @@
 package com.course.kafka.api.server;
 
 import com.course.kafka.api.request.OrderRequest;
-import com.course.kafka.api.responce.OrderResponse;
+import com.course.kafka.api.response.OrderResponse;
 import com.course.kafka.command.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.course.kafka.api.responce;
+package com.course.kafka.api.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

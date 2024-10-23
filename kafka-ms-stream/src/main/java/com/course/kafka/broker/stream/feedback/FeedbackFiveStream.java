@@ -11,12 +11,11 @@ import org.apache.kafka.streams.kstream.Predicate;
 import org.apache.kafka.streams.kstream.Repartitioned;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.support.serializer.JsonSerde;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Set;
 
-@Component
+//@Component
 public class FeedbackFiveStream {
 
   private static final Set<String> GOOD_WORDS = Set.of("happy", "good", "helpful");

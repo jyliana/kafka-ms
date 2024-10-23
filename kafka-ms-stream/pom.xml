@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.course.kafka</groupId>
-	<artifactId>kafka-stream-sample</artifactId>
+	<artifactId>kafka-ms-stream</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>kafka-stream-sample</name>
 	<description>Demo project for Spring Boot</description>
