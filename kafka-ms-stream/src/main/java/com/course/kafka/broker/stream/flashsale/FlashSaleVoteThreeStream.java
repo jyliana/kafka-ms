@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
 
-@Component
+//@Component
 public class FlashSaleVoteThreeStream {
 
   @Autowired
