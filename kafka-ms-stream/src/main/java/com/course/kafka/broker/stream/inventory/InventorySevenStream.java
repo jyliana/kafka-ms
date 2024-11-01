@@ -10,13 +10,12 @@ import org.apache.kafka.streams.kstream.SessionWindows;
 import org.apache.kafka.streams.kstream.WindowedSerdes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.support.serializer.JsonSerde;
-import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 
-@Component
+//@Component
 public class InventorySevenStream {
 
   @Autowired
